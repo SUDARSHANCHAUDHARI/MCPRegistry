@@ -1,0 +1,21 @@
+#!/bin/bash
+
+echo "🚀 MCP Registry — Quick Start"
+echo "=================================="
+echo ""
+echo "⚠️  BEFORE RUNNING THIS:"
+echo ""
+echo "1. Create a Supabase project at supabase.com"
+echo "2. Run the database schema SQL from docs/database-schema.sql"
+echo "3. Get your API keys from Supabase Settings"
+echo "4. Create .env.local with your credentials:"
+echo ""
+echo "   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co"
+echo "   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key"
+echo "   NEXT_PUBLIC_APP_URL=http://localhost:3000"
+echo "   SYNC_SECRET=any-random-string"
+echo ""
+echo "📖 Full setup guide: SETUP.md"
+echo ""
+echo "Starting dev server..."
+npm run dev

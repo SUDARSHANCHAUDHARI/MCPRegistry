@@ -1,0 +1,70 @@
+{
+  "name": "mcp-registry",
+  "displayName": "MCP Registry",
+  "description": "Discover and install MCP servers directly in VS Code",
+  "version": "1.0.0",
+  "publisher": "mcp-registry",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "keywords": ["mcp", "model-context-protocol", "ai", "claude", "registry"],
+  "icon": "media/icon.png",
+  "activationEvents": ["onCommand:mcp-registry.search"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "mcp-registry.search",
+        "title": "MCP Registry: Search Servers"
+      },
+      {
+        "command": "mcp-registry.install",
+        "title": "MCP Registry: Install Server"
+      },
+      {
+        "command": "mcp-registry.open",
+        "title": "MCP Registry: Open in Browser"
+      },
+      {
+        "command": "mcp-registry.trending",
+        "title": "MCP Registry: Show Trending"
+      }
+    ],
+    "viewsContainers": {
+      "sidebar": [
+        {
+          "id": "mcp-registry",
+          "title": "MCP Registry",
+          "icon": "media/sidebar-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "mcp-registry": [
+        {
+          "id": "mcp-registry.search",
+          "name": "Search",
+          "type": "tree"
+        },
+        {
+          "id": "mcp-registry.trending",
+          "name": "Trending",
+          "type": "tree"
+        },
+        {
+          "id": "mcp-registry.installed",
+          "name": "Installed",
+          "type": "tree"
+        }
+      ]
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/test-electron": "^2.3.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {}
+}

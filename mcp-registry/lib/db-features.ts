@@ -223,12 +223,13 @@ export async function getSimilarServers(serverId: string, limit: number = 5) {
     if (err1) throw err1
     if (!currentServer) return []
 
-    // Find servers in same category with similar rating
+    // Find servers in same category ordered by stars
     const { data: similar, error: err2 } = await supabase
       .from('mcp_servers')
       .select('*')
       .neq('id', serverId)
       .eq('status', 'approved')
+      .contains('category', currentServer.category ? [currentServer.category] : [])
       .order('github_stars', { ascending: false })
       .limit(limit)
 
@@ -430,8 +431,10 @@ export async function searchServersAdvanced(filters: {
       .eq('status', 'approved')
 
     if (filters.search) {
+      // Escape % and _ to prevent wildcard injection in ilike patterns
+      const safeSearch = filters.search.replace(/[%_\\]/g, '\\$&')
       query = query.or(
-        `name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`
+        `name.ilike.%${safeSearch}%,description.ilike.%${safeSearch}%`
       )
     }
 
@@ -486,21 +489,37 @@ export async function exportServersToJson(serverIds: string[]) {
   }
 }
 
-export async function importServersFromJson(jsonData: any): Promise<string[]> {
+export async function importServersFromJson(jsonData: { servers: unknown[] }): Promise<string[]> {
   try {
     const serverIds: string[] = []
+    const MAX_IMPORT_SIZE = 100
+    const servers = (jsonData.servers || []).slice(0, MAX_IMPORT_SIZE)
 
-    for (const server of jsonData.servers || []) {
+    for (const rawServer of servers) {
+      const server = rawServer as Record<string, unknown>
+
+      // Validate required fields
+      const name = typeof server.name === 'string' ? server.name.trim().slice(0, 100) : ''
+      const description = typeof server.description === 'string' ? server.description.trim().slice(0, 500) : ''
+      const github_url = typeof server.github_url === 'string' ? server.github_url.trim() : ''
+      const install_command = typeof server.install_command === 'string' ? server.install_command.trim().slice(0, 500) : ''
+      const category = typeof server.category === 'string' ? server.category.trim().slice(0, 50) : ''
+
+      if (!name || name.length < 3) continue
+      if (!description || description.length < 10) continue
+      if (!github_url.startsWith('https://github.com/')) continue
+      if (!install_command) continue
+
       const { data, error } = await supabase
         .from('mcp_servers')
         .upsert([
           {
-            name: server.name,
-            description: server.description,
-            github_url: server.github_url,
-            install_command: server.install_command,
-            category: server.category,
-            status: 'pending', // New imports start as pending
+            name,
+            description,
+            github_url,
+            install_command,
+            category,
+            status: 'pending',
           },
         ])
         .select()

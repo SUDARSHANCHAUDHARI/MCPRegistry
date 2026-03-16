@@ -1,6 +1,7 @@
 // API for import/export functionality
 import { NextResponse } from 'next/server'
 import { exportServersToJson, importServersFromJson } from '@/lib/db-features'
+import { createServerClient } from '@/lib/supabase'
 
 export async function GET(request: Request) {
   try {
@@ -11,7 +12,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'No server IDs specified' }, { status: 400 })
     }
 
-    const exported = await exportServersToJson(serverIds)
+    // Limit to 100 IDs per export request
+    const limitedIds = serverIds.slice(0, 100)
+    const exported = await exportServersToJson(limitedIds)
 
     return NextResponse.json(exported, {
       headers: {
@@ -27,11 +30,25 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    // Require authentication for imports
+    const supabase = await createServerClient()
+    const user = await supabase.auth.getUser()
+    if (!user.data.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const jsonData = await request.json()
 
     if (!jsonData.servers || !Array.isArray(jsonData.servers)) {
       return NextResponse.json(
         { error: 'Invalid format: must have servers array' },
+        { status: 400 }
+      )
+    }
+
+    if (jsonData.servers.length > 100) {
+      return NextResponse.json(
+        { error: 'Import limit is 100 servers per request' },
         { status: 400 }
       )
     }

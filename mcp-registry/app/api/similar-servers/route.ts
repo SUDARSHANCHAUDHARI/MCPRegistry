@@ -6,7 +6,8 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const serverId = searchParams.get('id')
-    const limit = Math.min(parseInt(searchParams.get('limit') || '5'), 20)
+    const rawLimit = parseInt(searchParams.get('limit') || '5', 10)
+    const limit = Math.min(isNaN(rawLimit) ? 5 : Math.max(1, rawLimit), 20)
 
     if (!serverId) {
       return NextResponse.json({ error: 'Server ID required' }, { status: 400 })

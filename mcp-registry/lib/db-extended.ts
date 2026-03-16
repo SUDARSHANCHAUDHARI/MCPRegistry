@@ -56,7 +56,6 @@ export async function getTrendingServers(): Promise<any[]> {
   const { data, error } = await supabase
     .from('ratings')
     .select('server_id, rating')
-    .eq('status', 'approved')
     .gt('created_at', weekAgo)
 
   if (error || !data) return []
@@ -142,7 +141,7 @@ export async function checkServerHealth(
     if (!repoMatch) return { success: false }
 
     const [, owner, repo] = repoMatch
-    const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`)
+    const response = await fetch(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`)
     const isHealthy = response.ok
 
     await supabase.from('server_health').upsert([

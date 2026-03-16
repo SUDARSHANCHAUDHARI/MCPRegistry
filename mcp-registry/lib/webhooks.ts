@@ -46,7 +46,12 @@ export function verifyWebhookSignature(
   secret: string
 ): boolean {
   const hash = crypto.createHmac('sha256', secret).update(payload).digest('hex')
-  return hash === signature
+  // Use timing-safe comparison to prevent timing attacks
+  try {
+    return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(signature, 'hex'))
+  } catch {
+    return false
+  }
 }
 
 // Webhook handlers for different event types

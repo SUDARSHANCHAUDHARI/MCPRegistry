@@ -1,6 +1,6 @@
 // API for collections management
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { createServerClient } from '@/lib/supabase'
 import {
   getUserCollections,
   createCollection,
@@ -45,6 +45,7 @@ export async function POST(request: Request) {
       serverId,
     } = await request.json()
 
+    const supabase = await createServerClient()
     const user = await supabase.auth.getUser()
     if (!user.data.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

@@ -1,10 +1,11 @@
 // API for moderation reports
 import { NextResponse } from 'next/server'
 import { getPendingReports, createModerationReport, reviewModerationReport } from '@/lib/db-features'
-import { supabase } from '@/lib/supabase'
+import { createServerClient } from '@/lib/supabase'
 
 export async function GET(request: Request) {
   try {
+    const supabase = await createServerClient()
     const user = await supabase.auth.getUser()
     if (!user.data.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -31,6 +32,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const supabase = await createServerClient()
     const user = await supabase.auth.getUser()
     const { action, serverId, reason, details, reportId, status, adminNotes } =
       await request.json()

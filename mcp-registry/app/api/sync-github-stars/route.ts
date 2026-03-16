@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAllServers } from '@/lib/db'
 import { supabase } from '@/lib/supabase'
+import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
-  // Check auth secret
-  const secret = request.headers.get('x-sync-secret')
-  if (secret !== process.env.SYNC_SECRET) {
+  // Check auth secret using timing-safe comparison to prevent timing attacks
+  const secret = request.headers.get('x-sync-secret') || ''
+  const expectedSecret = process.env.SYNC_SECRET || ''
+  if (
+    !expectedSecret ||
+    secret.length !== expectedSecret.length ||
+    !crypto.timingSafeEqual(Buffer.from(secret), Buffer.from(expectedSecret))
+  ) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -19,7 +25,7 @@ export async function POST(request: NextRequest) {
         if (!match) continue
 
         const [, owner, repo] = match
-        const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+        const response = await fetch(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`, {
           headers: process.env.GITHUB_TOKEN
             ? { Authorization: `token ${process.env.GITHUB_TOKEN}` }
             : {},

@@ -1,7 +1,7 @@
 // API for deployment guides
 import { NextResponse } from 'next/server'
 import { getDeploymentGuides, createDeploymentGuide } from '@/lib/db-features'
-import { supabase } from '@/lib/supabase'
+import { createServerClient } from '@/lib/supabase'
 
 export async function GET(request: Request) {
   try {
@@ -29,6 +29,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const supabase = await createServerClient()
     const user = await supabase.auth.getUser()
     if (!user.data.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

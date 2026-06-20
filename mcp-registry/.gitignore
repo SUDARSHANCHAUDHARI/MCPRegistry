@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Keep the committed env template (overrides .env.* ignore)
+!.env.example

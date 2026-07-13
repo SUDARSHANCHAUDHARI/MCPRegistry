@@ -431,11 +431,20 @@ export async function searchServersAdvanced(filters: {
       .eq('status', 'approved')
 
     if (filters.search) {
-      // Escape % and _ to prevent wildcard injection in ilike patterns
-      const safeSearch = filters.search.replace(/[%_\\]/g, '\\$&')
-      query = query.or(
-        `name.ilike.%${safeSearch}%,description.ilike.%${safeSearch}%`
-      )
+      // The value is interpolated into a PostgREST `.or()` filter string, where
+      // `,` `(` `)` are structural delimiters and `%` `_` `\` are ilike wildcards.
+      // Strip the delimiters (they can't be escaped inside .or()) and escape the
+      // wildcards, so a crafted search can't inject extra filter conditions.
+      const safeSearch = filters.search
+        .slice(0, 100)
+        .replace(/[(),*]/g, ' ')
+        .replace(/[%_\\]/g, '\\$&')
+        .trim()
+      if (safeSearch) {
+        query = query.or(
+          `name.ilike.%${safeSearch}%,description.ilike.%${safeSearch}%`
+        )
+      }
     }
 
     if (filters.category) {

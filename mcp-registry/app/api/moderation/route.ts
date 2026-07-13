@@ -38,6 +38,9 @@ export async function POST(request: Request) {
       await request.json()
 
     if (action === 'report') {
+      if (!user.data.user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
       if (!serverId || !reason) {
         return NextResponse.json(
           { error: 'serverId and reason required' },

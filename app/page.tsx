@@ -4,8 +4,8 @@ import { useState } from "react";
 const EXAMPLES = ["build a web scraper", "process payments", "send emails", "manage files", "query databases", "interact with GitHub"];
 const STACKS = ["Node.js", "Python", "TypeScript", "Go", "Rust", "Any"];
 
-interface MCPServer { name: string; description: string; category: string; installCommand: string; configExample: string; capabilities: string[]; }
-interface DiscoverResult { servers?: MCPServer[]; }
+interface MCPServer { name: string; description: string; category: string; installCommand: string; configExample: string; useCases: string[]; }
+interface DiscoverResult { recommendations?: MCPServer[]; }
 
 export default function MCPRegistryPage() {
   const [useCase, setUseCase] = useState("");
@@ -46,10 +46,10 @@ export default function MCPRegistryPage() {
         </div>
         <button onClick={discover} disabled={loading || !useCase.trim()} className="px-6 py-2 bg-green-700 hover:bg-green-600 disabled:opacity-40 text-white rounded-lg text-sm font-medium transition-colors mb-6">{loading ? "Discovering..." : "Find MCP Servers"}</button>
         {error && <div className="p-4 bg-red-900/30 border border-red-700 rounded-lg text-red-400 text-sm mb-4">{error}</div>}
-        {result?.servers && (
+        {result?.recommendations && (
           <div className="space-y-3">
-            <p className="text-slate-500 text-sm">{result.servers.length} MCP servers found</p>
-            {result.servers.map((srv, i) => (
+            <p className="text-slate-500 text-sm">{result.recommendations.length} MCP servers found</p>
+            {result.recommendations.map((srv, i) => (
               <div key={i} className="bg-[#111118] border border-green-900/30 rounded-xl overflow-hidden">
                 <div className="flex items-start justify-between p-4 cursor-pointer" onClick={() => setExpanded(expanded === i ? null : i)}>
                   <div className="flex-1">
@@ -58,7 +58,7 @@ export default function MCPRegistryPage() {
                       <span className="px-2 py-0.5 bg-green-900/30 text-green-600 text-xs rounded-full">{srv.category}</span>
                     </div>
                     <p className="text-slate-400 text-sm">{srv.description}</p>
-                    <div className="flex flex-wrap gap-1 mt-2">{srv.capabilities?.map((c, j) => <span key={j} className="px-2 py-0.5 bg-[#0d0d14] text-slate-500 text-xs rounded">{c}</span>)}</div>
+                    <div className="flex flex-wrap gap-1 mt-2">{srv.useCases?.map((c, j) => <span key={j} className="px-2 py-0.5 bg-[#0d0d14] text-slate-500 text-xs rounded">{c}</span>)}</div>
                   </div>
                   <span className="text-slate-600 ml-4">{expanded === i ? "▲" : "▼"}</span>
                 </div>

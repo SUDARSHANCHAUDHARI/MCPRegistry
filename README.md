@@ -41,7 +41,7 @@ Describe what you want to do (e.g. "send emails", "query databases", "interact w
 - ✅ **Config generation** — produces working claude_desktop_config.json snippets
 
 ### ⚙️ Technical Features
-- ✅ **Next.js 15 App Router** — server + client components
+- ✅ **Next.js 16 App Router** — server + client components
 - ✅ **TypeScript strict mode** — fully typed server and result interfaces
 - ✅ **Tailwind CSS** — dark green theme with expandable accordion cards
 
@@ -120,7 +120,6 @@ MCPRegistry/
 pnpm dev      # Start development server (Turbopack)
 pnpm build    # Production build
 pnpm start    # Start production server
-pnpm lint     # ESLint check
 ```
 
 ---
@@ -151,7 +150,7 @@ Get your key at [console.anthropic.com](https://console.anthropic.com). Add it t
 
 | Component | Technology |
 |---|---|
-| **Framework** | Next.js 15 (App Router) |
+| **Framework** | Next.js 16 (App Router) |
 | **Language** | TypeScript (strict mode) |
 | **Styling** | Tailwind CSS |
 | **AI** | Claude API — claude-sonnet-4-6 |
